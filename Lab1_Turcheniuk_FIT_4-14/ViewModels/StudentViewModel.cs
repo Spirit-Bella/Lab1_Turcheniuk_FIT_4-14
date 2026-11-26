@@ -1,0 +1,90 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using Microsoft.Maui.Controls;
+using Lab1_Turcheniuk_FIT_4_14.Models;
+
+namespace Lab1_Turcheniuk_FIT_4_14.ViewModels
+{
+    public class StudentViewModel : INotifyPropertyChanged
+    {
+        private Student _student = new();
+
+        public ObservableCollection<Student> Students { get; } = new();
+        public ICommand AddStudentCommand { get; }
+
+        public StudentViewModel()
+        {
+            AddStudentCommand = new Command(AddStudent, CanAddStudent);
+        }
+
+        private void AddStudent()
+        {
+            Students.Add(new Student
+            {
+                FullName = FullName,
+                Group = Group,
+                AverageScore = AverageScore
+            });
+
+            FullName = string.Empty;
+            Group = string.Empty;
+            AverageScore = 0;
+        }
+
+        private bool CanAddStudent() => !string.IsNullOrWhiteSpace(FullName);
+
+        public string FullName
+        {
+            get => _student.FullName;
+            set
+            {
+                if (_student.FullName != value)
+                {
+                    _student.FullName = value;
+                    OnPropertyChanged(nameof(FullName));
+                    ((Command)AddStudentCommand).ChangeCanExecute();
+                }
+            }
+        }
+
+        public string Group
+        {
+            get => _student.Group;
+            set
+            {
+                if (_student.Group != value)
+                {
+                    _student.Group = value;
+                    OnPropertyChanged(nameof(Group));
+                }
+            }
+        }
+
+        public double AverageScore
+        {
+            get => _student.AverageScore;
+            set
+            {
+                if (_student.AverageScore != value)
+                {
+                    _student.AverageScore = value;
+                    OnPropertyChanged(nameof(AverageScore));
+                    OnPropertyChanged(nameof(ScoreColor));
+                }
+            }
+        }
+
+        public string ScoreColor => AverageScore >= 4.0 ? "Green" : "Red";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
